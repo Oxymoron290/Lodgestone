@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lodgestone.Server.Controllers
@@ -18,6 +19,7 @@ namespace Lodgestone.Server.Controllers
             _logger = logger;
         }
 
+        [Authorize(Roles = "Administrator")]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {

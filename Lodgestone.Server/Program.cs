@@ -1,4 +1,7 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
+
 namespace Lodgestone.Server
 {
     public class Program
@@ -8,7 +11,13 @@ namespace Lodgestone.Server
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApi(options =>
+                {
+                    builder.Configuration.Bind("AzureAd", options);
+                    options.TokenValidationParameters.NameClaimType = "name";
+                }, options => { builder.Configuration.Bind("AzureAd", options); });
+            builder.Services.AddAuthorization();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -28,6 +37,7 @@ namespace Lodgestone.Server
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
