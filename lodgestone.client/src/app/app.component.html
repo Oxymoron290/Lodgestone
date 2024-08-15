@@ -1,5 +1,16 @@
 ﻿<h1 id="tableLabel">Weather forecast</h1>
 
+
+<button class="btn btn-primary" *ngIf="!isLoggedIn()" (click)="login()">Login</button>
+<button class="btn btn-secondary" *ngIf="isLoggedIn()" (click)="logout()">Logout</button>
+
+<h2 *ngIf="isLoggedIn()">JWT Claims</h2>
+<ul *ngIf="isLoggedIn()">
+  <li *ngFor="let claim of claims | keyvalue">
+    <strong>{{claim.key}}:</strong> {{claim.value}}
+  </li>
+</ul>
+
 <p>This component demonstrates fetching data from the server.</p>
 
 <p *ngIf="!forecasts"><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>

@@ -19,7 +19,7 @@ namespace Lodgestone.Server.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {

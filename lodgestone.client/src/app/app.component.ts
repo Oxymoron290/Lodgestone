@@ -1,4 +1,7 @@
 import { HttpClient } from '@angular/common/http';
+import { MsalService, MsalBroadcastService } from '@azure/msal-angular';
+import { InteractionStatus } from '@azure/msal-browser';
+import { filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 
 interface WeatherForecast {
@@ -14,12 +17,24 @@ interface WeatherForecast {
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
+  claims: any = {};
   public forecasts: WeatherForecast[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: MsalService, private msalBroadcastService: MsalBroadcastService) {
+    this.msalBroadcastService.inProgress$
+    .pipe(filter((status: InteractionStatus) => status === InteractionStatus.None))
+    .subscribe(() => {
+      const account = this.authService.instance.getAllAccounts()[0];
+      if (account) {
+        this.authService.instance.setActiveAccount(account);
+        this.loadClaims();
+      }
+    });
+  }
 
   ngOnInit() {
     this.getForecasts();
+    this.loadClaims();
   }
 
   getForecasts() {
@@ -31,6 +46,30 @@ export class AppComponent implements OnInit {
         console.error(error);
       }
     );
+  }
+
+  loadClaims() {
+    const account = this.authService.instance.getActiveAccount();
+    if (account && account.idTokenClaims) {
+      console.log(JSON.stringify(account));
+      this.claims = account.idTokenClaims;
+    }
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.instance.getActiveAccount() != null;
+  }
+
+  login() {
+    this.authService.loginRedirect({
+      scopes: ['user.read']
+    });
+  }
+
+  logout() {
+    this.authService.logoutRedirect({
+      postLogoutRedirectUri: 'https://localhost:4200'
+    });
   }
 
   title = 'lodgestone.client';
